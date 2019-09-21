@@ -41,6 +41,7 @@ namespace Zenject
         public object ConcreteIdentifier;
         public bool SaveProvider;
         public bool OnlyBindIfNotBound;
+        public List<Type> OnlyBindIfNotBoundTypes;
         public bool RequireExplicitScope;
         public object Identifier;
         public readonly List<Type> ContractTypes;
@@ -58,6 +59,7 @@ namespace Zenject
         public BindInfo()
         {
             ContractTypes = new List<Type>();
+            OnlyBindIfNotBoundTypes = new List<Type>();
             ToTypes = new List<Type>();
             Arguments = new List<TypeValuePair>();
 
@@ -82,6 +84,7 @@ namespace Zenject
             ConcreteIdentifier = null;
             SaveProvider = false;
             OnlyBindIfNotBound = false;
+            OnlyBindIfNotBoundTypes.Clear();
             RequireExplicitScope = false;
             Identifier = null;
             ContractTypes.Clear();

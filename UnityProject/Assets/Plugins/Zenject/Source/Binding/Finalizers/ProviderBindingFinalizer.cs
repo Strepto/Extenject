@@ -100,6 +100,9 @@ namespace Zenject
         protected void RegisterProviderPerContract(
             DiContainer container, Func<DiContainer, Type, IProvider> providerFunc)
         {
+            if (IsAnyBindIfNotBoundTypesAlreadyBound(container))
+                return;
+
             foreach (var contractType in BindInfo.ContractTypes)
             {
                 var provider = providerFunc(container, contractType);
@@ -120,6 +123,10 @@ namespace Zenject
         protected void RegisterProviderForAllContracts(
             DiContainer container, IProvider provider)
         {
+
+            if (IsAnyBindIfNotBoundTypesAlreadyBound(container))
+                return;
+
             foreach (var contractType in BindInfo.ContractTypes)
             {
                 if (BindInfo.MarkAsUniqueSingleton)
@@ -142,6 +149,9 @@ namespace Zenject
         {
             Assert.That(!BindInfo.ContractTypes.IsEmpty());
             Assert.That(!concreteTypes.IsEmpty());
+
+            if (IsAnyBindIfNotBoundTypesAlreadyBound(container))
+                return;
 
             foreach (var contractType in BindInfo.ContractTypes)
             {
@@ -198,6 +208,24 @@ namespace Zenject
             return false;
         }
 
+        /// <summary>
+        /// Checks if any of the <see cref="BindInfo.ContractTypes"/> are matching <see cref="BindInfo.OnlyBindIfNotBoundTypes"></see> and are not Bound/>
+        /// </summary>
+        /// <param name="container"></param>
+        /// <returns></returns>
+        bool IsAnyBindIfNotBoundTypesAlreadyBound(DiContainer container)
+        {
+            foreach (var ct in BindInfo.ContractTypes)
+            {
+                if (BindInfo.OnlyBindIfNotBoundTypes.Contains(ct) && (container.HasBindingId(ct, BindInfo.Identifier)))
+                {
+                    return true;
+                }
+            }
+
+            return false;
+        }
+
         // Note that if multiple contract types are provided per concrete type,
         // it will re-use the same provider for each contract type
         // (each concrete type will have its own provider though)
@@ -208,6 +236,9 @@ namespace Zenject
         {
             Assert.That(!BindInfo.ContractTypes.IsEmpty());
             Assert.That(!concreteTypes.IsEmpty());
+
+            if (IsAnyBindIfNotBoundTypesAlreadyBound(container))
+                return;
 
             var providerMap = ZenPools.SpawnDictionary<Type, IProvider>();
             try
